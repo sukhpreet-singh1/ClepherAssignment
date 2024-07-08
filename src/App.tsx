@@ -5,7 +5,6 @@ import DataFetcher from "./DataFetcher";
 function App() {
   return (
     <div className="App">
-      <h1>IBM Stock Price (5min Interval)</h1>
       <DataFetcher />
     </div>
   );

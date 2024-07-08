@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StockChart from "./StockChart";
+import Header from "./Header";
+import Dropdown from "./Dropdown";
 
 interface StockData {
   "Meta Data": {
@@ -25,12 +27,24 @@ const DataFetcher: React.FC = () => {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDropdown, setDropdownValue] = useState<string>(
+    "TIME_SERIES_INTRADAY"
+  );
+
+  const dropdownOptions: Option[] = [
+    { value: "TIME_SERIES_INTRADAY", label: "Time Series Intraday" },
+    { value: "TIME_SERIES_DAILY", label: "Time Series Daily" },
+  ];
+
+  const handleDropdownChange = (value: string) => {
+    setDropdownValue(value);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=RIBXT3XYLI69PC0Q"
+          `https://www.alphavantage.co/query?function=${selectedDropdown}&symbol=IBM&interval=5min&apikey=RIBXT3XYLI69PC0Q`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -51,7 +65,13 @@ const DataFetcher: React.FC = () => {
   if (error) return <div>{error}</div>;
   if (!stockData) return <div>No data available</div>;
 
-  return <StockChart data={stockData["Time Series (5min)"]} />;
+  return (
+    <>
+      <Header data={stockData["Meta Data"]} />
+      <Dropdown options={dropdownOptions} onChange={handleDropdownChange} />
+      <StockChart data={stockData["Time Series (5min)"]} />
+    </>
+  );
 };
 
 export default DataFetcher;
